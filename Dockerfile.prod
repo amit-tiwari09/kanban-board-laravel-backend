@@ -1,0 +1,102 @@
+# ============================================================================
+# Stage 1 -> Composer Dependencies
+# ============================================================================
+
+FROM composer:2 AS composer
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --prefer-dist \
+    --no-scripts
+
+COPY . .
+
+RUN composer dump-autoload --optimize
+RUN php artisan package:discover --ansi
+
+# ============================================================================
+# Stage 2 -> Frontend Build
+# ============================================================================
+
+FROM node:22 AS node
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+# ============================================================================
+# Stage 3 -> Final Production Image
+# ============================================================================
+
+FROM php:8.4-fpm AS production
+
+WORKDIR /var/www
+
+# ============================================================================
+# Install Required Packages
+# ============================================================================
+
+RUN apt-get update && apt-get install -y \
+    unzip \
+    zip \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    && docker-php-ext-install \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip
+
+# ============================================================================
+# Copy Application
+# ============================================================================
+
+COPY . .
+
+# ============================================================================
+# Copy Vendor From Composer Stage
+# ============================================================================
+
+COPY --from=composer /app/vendor ./vendor
+
+# ============================================================================
+# Copy Built Frontend Assets
+# ============================================================================
+
+COPY --from=node /app/public/build ./public/build
+
+# ============================================================================
+# Laravel Optimization
+# ============================================================================
+
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
+
+# ============================================================================
+# Permissions
+# ============================================================================
+
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+EXPOSE 9000
+
+CMD ["php-fpm"]
