@@ -2,6 +2,7 @@
 
 namespace App\Services\Users;
 
+use App\DTOs\Auth\UserRegisterDto;
 use App\Interfaces\Repositories\Users\UserRepositoryInterface;
 
 class AuthService
@@ -18,8 +19,5 @@ class AuthService
     /** ======================================================================
      *
      * ======================================================================*/
-    public function register(array $data): array 
-    {
-        
-    }
+    public function register(UserRegisterDto $dto): array {}
 }
