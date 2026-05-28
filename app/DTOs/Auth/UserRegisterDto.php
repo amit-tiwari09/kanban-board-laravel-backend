@@ -8,6 +8,7 @@ class UserRegisterDto
         public readonly string $first_name,
         public readonly string $email,
         public readonly string $password,
+        public readonly string $username,
         public readonly ?int $phone_number = null,
         public readonly ?string $country_code = null,
         public readonly ?string $last_name = null,
@@ -18,6 +19,7 @@ class UserRegisterDto
         return new self(
             first_name: $data['first_name'],
             email: $data['email'],
+            username: $data['username'],
             password: $data['password'],
             phone_number: $data['phone_number'] ?? null,
             country_code: $data['country_code'] ?? null,

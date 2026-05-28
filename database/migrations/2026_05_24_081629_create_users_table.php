@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('email', 200)->unique();
             $table->unsignedBigInteger('email_verified_at');
             $table->string('username', 100)->unique();
-            $table->unsignedBigInteger('phone_number');
-            $table->string('country_code', 10);
+            $table->unsignedBigInteger('phone_number')->nullable();
+            $table->string('country_code', 10)->nullable();
             $table->string('country', 100)->nullable();
             $table->unsignedBigInteger('phone_number_verified_at');
             $table->string('password', 200);
