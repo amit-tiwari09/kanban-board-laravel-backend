@@ -20,11 +20,11 @@ class AuthController extends Controller
         $response = $this->authService->register($dto);
 
         return response()->json([
-            'success' => $response['status'],
-            'messages' => $response['messages'],
+            'success' => $response['success'],
+            'message' => $response['message'],
             'data' => $response['data'] ?? null,
             'errors' => $response['errors'] ?? null,
             'meta' => $response['meta'] ?? null,
-        ], 422);
+        ], $response['code']);
     }
 }

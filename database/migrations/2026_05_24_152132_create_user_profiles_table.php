@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('user_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users', 'id')->onDelete('cascade');
-            $table->text('bio');
+            $table->text('bio')->nullable();
             $table->string('location', 200)->nullable();
             $table->foreignId('profile_image_id')->nullable()
                 ->constrained('files', 'id')
